@@ -22,7 +22,9 @@ export default defineConfig({
         draftMode: {
           enable: '/api/draft',
         },
-        origin: 'https://heavymetaltested.com',
+        origin: typeof window !== 'undefined' && window.location.hostname === 'localhost' 
+          ? 'http://localhost:3000' 
+          : 'https://heavymetaltested.com',
       },
     }),
   ],
