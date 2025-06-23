@@ -1,0 +1,378 @@
+const fs = require('fs');
+const path = require('path');
+
+// This script now generates a JSONL file for Sanity CLI import.
+// It no longer connects directly to the Sanity client.
+
+// Homepage content data
+const homepageData = {
+  _id: 'homepage', // Assign a predictable ID
+  _type: 'page',
+  title: 'Heavy Metal Testing & Certification',
+  slug: {
+    _type: 'slug',
+    current: 'home'
+  },
+  seoSection: {
+    seoTitle: 'Heavy Metal Testing & Certification | Heavy Metal Tested',
+    metaDescription: 'Professional heavy metal testing and certification for consumer products. Ensure your products are safe from lead, mercury, cadmium, and arsenic contamination.',
+    keywords: ['heavy metal testing', 'certification', 'safety', 'compliance', 'lead testing', 'mercury testing'],
+    noIndex: false,
+    noFollow: false
+  },
+  structuredData: {
+    pageType: 'WebPage',
+    breadcrumbTitle: 'Home'
+  },
+  content: [
+    {
+      _key: 'hero1',
+      _type: 'heroSection',
+      badgeText: 'Trusted by leading brands worldwide',
+      headline: 'Scientific Testing for',
+      highlightText: 'Heavy Metals',
+      description: 'Our comprehensive testing and certification program ensures your products are safe from harmful heavy metal contamination.',
+      primaryButton: {
+        text: 'Get Certified',
+        link: '#contact'
+      },
+      secondaryButton: {
+        text: 'Learn More',
+        link: '#process'
+      }
+    },
+    {
+      _key: 'features1',
+      _type: 'featuresSection',
+      title: 'Why Choose Our Certification',
+      description: 'Our rigorous testing methodology ensures your products are free from harmful heavy metal contamination, protecting your customers and enhancing your brand\'s reputation.',
+      features: [
+        {
+          _key: 'feat1',
+          title: 'Scientific Accuracy',
+          description: 'Industry-leading testing protocols with precision down to parts per billion for accurate detection of heavy metals.',
+          icon: 'shield'
+        },
+        {
+          _key: 'feat2',
+          title: 'Comprehensive Testing',
+          description: 'We test for lead, mercury, cadmium, arsenic and other harmful heavy metals across all product components.',
+          icon: 'beaker'
+        },
+        {
+          _key: 'feat3',
+          title: 'Trusted Certification',
+          description: 'Our certification is recognized worldwide as the gold standard for heavy metal safety in consumer products.',
+          icon: 'award'
+        },
+        {
+          _key: 'feat4',
+          title: 'Transparent Reporting',
+          description: 'Detailed reports that clearly communicate testing results and provide actionable insights.',
+          icon: 'clipboard'
+        }
+      ]
+    },
+    {
+      _key: 'faq1',
+      _type: 'faqSection',
+      title: 'Frequently Asked Questions',
+      description: 'Get answers to common questions about our heavy metal testing and certification process.',
+      contactText: 'Have a question that\'s not covered here?',
+      contactButtonText: 'Contact Our Team',
+      faqs: [
+        {
+          _key: 'faq-q1',
+          question: 'What heavy metals do you test for?',
+          answer: 'We test for the most common and harmful heavy metals including lead, mercury, arsenic, cadmium, chromium, and aluminum. Our comprehensive panel can also include additional metals like nickel, antimony, and tin upon request, based on your specific product requirements and regulatory needs.'
+        },
+        {
+          _key: 'faq-q2',
+          question: 'How accurate is your testing methodology?',
+          answer: 'Our laboratory utilizes state-of-the-art Inductively Coupled Plasma Mass Spectrometry (ICP-MS) technology that can detect heavy metals at the parts per billion (ppb) level. This precision allows us to meet or exceed all international regulatory standards for heavy metal testing with an accuracy rate of 99.9%.'
+        },
+        {
+          _key: 'faq-q3',
+          question: 'How long does the certification process take?',
+          answer: 'The standard certification timeline is 2-3 weeks from sample submission to final certification. Expedited testing is available for time-sensitive projects, with results possible in as little as 5 business days for an additional fee. The exact timeline depends on the complexity of the product and the specific metals being tested.'
+        },
+        {
+          _key: 'faq-q4',
+          question: 'How often should products be recertified?',
+          answer: 'We recommend annual recertification for most products to ensure ongoing compliance with safety standards. Products with changing ingredients or sourcing may require more frequent testing. Our certification is valid for one year, after which a simplified renewal process is available.'
+        },
+        {
+          _key: 'faq-q5',
+          question: 'What is the difference between your certification and regulatory compliance testing?',
+          answer: 'Regulatory compliance testing focuses solely on meeting minimum government standards. Our certification goes beyond these minimums, applying more stringent thresholds based on the latest scientific research. Our certification not only ensures you meet regulatory requirements but also provides a recognized mark of quality that consumers trust.'
+        },
+        {
+          _key: 'faq-q6',
+          question: 'Do you test international products?',
+          answer: 'Yes, we provide testing services for products from around the world. Our laboratory can accommodate international shipping of samples, and our certification is recognized globally. We\'re familiar with international regulations and can help ensure your products meet standards in your target markets.'
+        },
+        {
+          _key: 'faq-q7',
+          question: 'What does your certification logo look like and how can it be used?',
+          answer: 'Our certification logo features a distinctive shield with a laboratory beaker symbol, conveying both protection and scientific testing. Certified companies receive comprehensive brand guidelines on how to use the logo on packaging, marketing materials, and websites. The logo can be used for the duration of your certification validity.'
+        }
+      ]
+    }
+  ]
+}
+
+// Sample blog posts
+const samplePosts = [
+  {
+    _id: 'post1',
+    _type: 'post',
+    title: 'Understanding Heavy Metal Testing: A Complete Guide',
+    slug: {
+      _type: 'slug',
+      current: 'understanding-heavy-metal-testing-complete-guide'
+    },
+    excerpt: 'Learn everything you need to know about heavy metal testing, from the science behind it to how it protects consumers and ensures product safety.',
+    publishedAt: '2024-01-15T10:00:00Z',
+    content: [
+      {
+        _key: 'c1-h2',
+        _type: 'block',
+        style: 'h2',
+        children: [
+          {
+            _key: 'c1-s1',
+            _type: 'span',
+            text: 'What is Heavy Metal Testing?'
+          }
+        ]
+      },
+      {
+        _key: 'c1-p1',
+        _type: 'block',
+        children: [
+          {
+            _key: 'c1-s2',
+            _type: 'span',
+            text: 'Heavy metal testing is a critical process that identifies and quantifies potentially harmful metals in consumer products. These metals, including lead, mercury, cadmium, and arsenic, can pose serious health risks, especially to children and vulnerable populations.'
+          }
+        ]
+      },
+      {
+        _key: 'c1-h2',
+        _type: 'block',
+        style: 'h2',
+        children: [
+          {
+            _type: 'span',
+            text: 'Why Heavy Metal Testing Matters'
+          }
+        ]
+      },
+      {
+        _key: 'c1-p2',
+        _type: 'block',
+        children: [
+          {
+            _type: 'span',
+            text: 'Heavy metals can accumulate in the body over time, leading to various health issues including developmental problems in children, neurological disorders, and organ damage. Regular testing ensures products meet safety standards and protects consumers.'
+          }
+        ]
+      },
+      {
+        _key: 'c1-h3',
+        _type: 'block',
+        style: 'h3',
+        children: [
+          {
+            _type: 'span',
+            text: 'Common Heavy Metals Tested'
+          }
+        ]
+      },
+      {
+        _key: 'c1-p3',
+        _type: 'block',
+        children: [
+          {
+            _type: 'span',
+            text: 'Our comprehensive testing panel includes lead, mercury, cadmium, arsenic, chromium, and aluminum. Each metal has specific health implications and regulatory limits that must be met.'
+          }
+        ]
+      }
+    ],
+    seoSection: {
+      seoTitle: 'Heavy Metal Testing Guide: Complete Overview & Process',
+      metaDescription: 'Comprehensive guide to heavy metal testing for consumer products. Learn about testing methods, safety standards, and why it matters for product safety.',
+      keywords: ['heavy metal testing', 'product safety', 'lead testing', 'mercury testing', 'consumer safety'],
+      noIndex: false,
+      noFollow: false
+    },
+    structuredData: {
+      articleType: 'BlogPosting',
+      readingTime: 5
+    }
+  },
+  {
+    _id: 'post2',
+    _type: 'post',
+    title: 'The Science Behind ICP-MS Testing Technology',
+    slug: {
+      _type: 'slug',
+      current: 'science-behind-icp-ms-testing-technology'
+    },
+    excerpt: 'Discover how Inductively Coupled Plasma Mass Spectrometry (ICP-MS) provides the most accurate and sensitive heavy metal detection available.',
+    publishedAt: '2024-01-20T14:30:00Z',
+    content: [
+      {
+        _key: 'c2-h2',
+        _type: 'block',
+        style: 'h2',
+        children: [
+          {
+            _key: 'c2-s1',
+            _type: 'span',
+            text: 'What is ICP-MS Technology?'
+          }
+        ]
+      },
+      {
+        _key: 'c2-p1',
+        _type: 'block',
+        children: [
+          {
+            _key: 'c2-s2',
+            _type: 'span',
+            text: 'Inductively Coupled Plasma Mass Spectrometry (ICP-MS) is the gold standard for heavy metal detection. This advanced analytical technique can detect metals at concentrations as low as parts per trillion, making it the most sensitive method available.'
+          }
+        ]
+      },
+      {
+        _key: 'c2-h2',
+        _type: 'block',
+        style: 'h2',
+        children: [
+          {
+            _type: 'span',
+            text: 'How ICP-MS Works'
+          }
+        ]
+      },
+      {
+        _key: 'c2-p2',
+        _type: 'block',
+        children: [
+          {
+            _type: 'span',
+            text: 'The process begins with sample preparation, where the product is digested in acid to release the metals. The sample is then introduced into a high-temperature plasma, which ionizes the metals. These ions are then separated by mass and detected with incredible precision.'
+          }
+        ]
+      },
+      {
+        _key: 'c2-h3',
+        _type: 'block',
+        style: 'h3',
+        children: [
+          {
+            _type: 'span',
+            text: 'Advantages of ICP-MS'
+          }
+        ]
+      },
+      {
+        _key: 'c2-p3',
+        _type: 'block',
+        children: [
+          {
+            _type: 'span',
+            text: 'ICP-MS offers unparalleled sensitivity, accuracy, and the ability to detect multiple elements simultaneously. This makes it ideal for comprehensive heavy metal screening in consumer products.'
+          }
+        ]
+      }
+    ],
+    seoSection: {
+      seoTitle: 'ICP-MS Testing Technology: Advanced Heavy Metal Detection',
+      metaDescription: 'Learn about ICP-MS technology and how it provides the most accurate heavy metal detection for consumer product safety testing.',
+      keywords: ['ICP-MS', 'mass spectrometry', 'heavy metal detection', 'analytical chemistry', 'product testing'],
+      noIndex: false,
+      noFollow: false
+    },
+    structuredData: {
+      articleType: 'TechArticle',
+      readingTime: 4
+    }
+  }
+]
+
+// Sample categories
+const sampleCategories = [
+  {
+    _id: 'cat-tech',
+    _type: 'category',
+    title: 'Testing Technology',
+    description: 'Articles about testing methodologies and technologies used in heavy metal detection.'
+  },
+  {
+    _id: 'cat-safety',
+    _type: 'category',
+    title: 'Safety Standards',
+    description: 'Information about safety standards, regulations, and compliance requirements.'
+  },
+  {
+    _id: 'cat-insights',
+    _type: 'category',
+    title: 'Industry Insights',
+    description: 'News and insights about the heavy metal testing industry and consumer safety.'
+  }
+]
+
+// Sample authors
+const sampleAuthors = [
+  {
+    _id: 'author-chen',
+    _type: 'author',
+    name: 'Dr. Sarah Chen',
+    bio: 'Lead scientist and technical director with over 15 years of experience in analytical chemistry and heavy metal testing.',
+  },
+  {
+    _id: 'author-rodriguez',
+    _type: 'author',
+    name: 'Michael Rodriguez',
+    bio: 'Certification specialist and regulatory expert with deep knowledge of international safety standards.',
+  }
+]
+
+function generateContentFile() {
+  try {
+    console.log('📝 Generating content file for Sanity CLI...');
+
+    // Add references to posts
+    samplePosts[0].author = { _type: 'reference', _ref: 'author-chen' };
+    samplePosts[0].categories = [{ _type: 'reference', _ref: 'cat-insights', _key: 'ref1' }];
+    samplePosts[1].author = { _type: 'reference', _ref: 'author-rodriguez' };
+    samplePosts[1].categories = [{ _type: 'reference', _ref: 'cat-tech', _key: 'ref2' }];
+
+    const allDocuments = [
+      ...sampleCategories,
+      ...sampleAuthors,
+      ...samplePosts,
+      homepageData
+    ];
+
+    const ndjson = allDocuments.map(doc => JSON.stringify(doc)).join('\n');
+    const outputPath = path.join(process.cwd(), 'content.ndjson');
+    fs.writeFileSync(outputPath, ndjson);
+
+    console.log(`✅ Content file generated at: ${outputPath}`);
+    console.log('\nNext steps:');
+    console.log('1. Make sure you are logged into the Sanity CLI.');
+    console.log('   Run `npx sanity login` if you are not.');
+    console.log('2. Run the following command to import the content:');
+    console.log('   `npx sanity dataset import content.ndjson production --replace`');
+
+  } catch (error) {
+    console.error('❌ Error generating content file:', error);
+  }
+}
+
+// Run the generation
+generateContentFile(); 

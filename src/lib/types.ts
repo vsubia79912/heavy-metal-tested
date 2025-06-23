@@ -7,11 +7,29 @@ export interface Post {
   content: any // This will be portable text from Sanity
   excerpt?: string
   publishedAt: string
-  seoTitle?: string
-  metaDescription?: string
   author?: string
   categories?: string[]
   featuredImage?: string
+  featuredImageAlt?: string
+  featuredImageCaption?: string
+  seoSection?: {
+    seoTitle?: string
+    metaDescription?: string
+    keywords?: string[]
+    openGraphImage?: {
+      asset?: {
+        url: string
+      }
+      alt?: string
+    }
+    canonicalUrl?: string
+    noIndex?: boolean
+    noFollow?: boolean
+  }
+  structuredData?: {
+    articleType?: string
+    readingTime?: number
+  }
 }
 
 export interface PostListItem {
@@ -25,6 +43,16 @@ export interface PostListItem {
   author?: string
   categories?: string[]
   featuredImage?: string
+  featuredImageAlt?: string
+  seoSection?: {
+    seoTitle?: string
+    metaDescription?: string
+    keywords?: string[]
+  }
+  structuredData?: {
+    articleType?: string
+    readingTime?: number
+  }
 }
 
 export interface Author {
@@ -47,9 +75,24 @@ export interface Page {
   slug: {
     current: string
   }
-  seoTitle?: string
-  metaDescription?: string
-  openGraphImage?: string
+  seoSection?: {
+    seoTitle?: string
+    metaDescription?: string
+    keywords?: string[]
+    openGraphImage?: {
+      asset?: {
+        url: string
+      }
+      alt?: string
+    }
+    canonicalUrl?: string
+    noIndex?: boolean
+    noFollow?: boolean
+  }
+  structuredData?: {
+    pageType?: string
+    breadcrumbTitle?: string
+  }
   content: PageContent[]
 }
 

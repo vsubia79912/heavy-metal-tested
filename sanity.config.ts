@@ -23,7 +23,7 @@ export default defineConfig({
           enable: '/api/draft',
         },
         origin: typeof window !== 'undefined' && window.location.hostname === 'localhost' 
-          ? 'http://localhost:3000' 
+          ? 'http://localhost:3001' 
           : 'https://heavymetaltested.com',
       },
     }),

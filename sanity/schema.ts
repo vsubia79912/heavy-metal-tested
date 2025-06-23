@@ -26,6 +26,7 @@ export const post = defineType({
       title: 'Excerpt',
       type: 'text',
       rows: 4,
+      description: 'Brief summary of the post (used for meta description if not provided)',
     }),
     defineField({
       name: 'content',
@@ -38,6 +39,21 @@ export const post = defineType({
         {
           type: 'image',
           options: {hotspot: true},
+          fields: [
+            {
+              name: 'alt',
+              title: 'Alt Text',
+              type: 'string',
+              description: 'Important for SEO and accessibility. Describe the image content.',
+              validation: (Rule) => Rule.required(),
+            },
+            {
+              name: 'caption',
+              title: 'Caption',
+              type: 'string',
+              description: 'Optional caption displayed below the image',
+            },
+          ],
         },
       ],
     }),
@@ -48,6 +64,21 @@ export const post = defineType({
       options: {
         hotspot: true,
       },
+      fields: [
+        {
+          name: 'alt',
+          title: 'Alt Text',
+          type: 'string',
+          description: 'Important for SEO and accessibility. Describe the image content.',
+          validation: (Rule) => Rule.required(),
+        },
+        {
+          name: 'caption',
+          title: 'Caption',
+          type: 'string',
+          description: 'Optional caption displayed below the image',
+        },
+      ],
     }),
     defineField({
       name: 'publishedAt',
@@ -67,18 +98,105 @@ export const post = defineType({
       type: 'array',
       of: [{type: 'reference', to: [{type: 'category'}]}],
     }),
+    // SEO Section
     defineField({
-      name: 'seoTitle',
-      title: 'SEO Title',
-      type: 'string',
-      description: 'Title for search engines (optional - will use main title if not provided)',
+      name: 'seoSection',
+      title: 'SEO Settings',
+      type: 'object',
+      description: 'Search engine optimization settings for this post',
+      fields: [
+        {
+          name: 'seoTitle',
+          title: 'SEO Title',
+          type: 'string',
+          description: 'Title for search engines (50-60 characters recommended). Leave empty to use main title.',
+          validation: (Rule) => Rule.max(60).warning('SEO titles should be under 60 characters'),
+        },
+        {
+          name: 'metaDescription',
+          title: 'Meta Description',
+          type: 'text',
+          rows: 3,
+          description: 'Description for search engines and social media (150-160 characters recommended)',
+          validation: (Rule) => Rule.max(160).warning('Meta descriptions should be under 160 characters'),
+        },
+        {
+          name: 'keywords',
+          title: 'Keywords',
+          type: 'array',
+          of: [{type: 'string'}],
+          description: 'Relevant keywords for this post (comma-separated)',
+          options: {
+            layout: 'tags',
+          },
+        },
+        {
+          name: 'openGraphImage',
+          title: 'Open Graph Image',
+          type: 'image',
+          description: 'Image for social media sharing (1200x630px recommended). Leave empty to use featured image.',
+          options: {
+            hotspot: true,
+          },
+          fields: [
+            {
+              name: 'alt',
+              title: 'Alt Text',
+              type: 'string',
+              description: 'Alt text for the Open Graph image',
+            },
+          ],
+        },
+        {
+          name: 'canonicalUrl',
+          title: 'Canonical URL',
+          type: 'url',
+          description: 'Canonical URL if this content exists elsewhere (optional)',
+        },
+        {
+          name: 'noIndex',
+          title: 'No Index',
+          type: 'boolean',
+          description: 'Prevent search engines from indexing this post',
+          initialValue: false,
+        },
+        {
+          name: 'noFollow',
+          title: 'No Follow',
+          type: 'boolean',
+          description: 'Prevent search engines from following links on this post',
+          initialValue: false,
+        },
+      ],
     }),
+    // Structured Data
     defineField({
-      name: 'metaDescription',
-      title: 'Meta Description',
-      type: 'text',
-      rows: 3,
-      description: 'Description for search engines and social media',
+      name: 'structuredData',
+      title: 'Structured Data',
+      type: 'object',
+      description: 'Additional structured data for search engines',
+      fields: [
+        {
+          name: 'articleType',
+          title: 'Article Type',
+          type: 'string',
+          options: {
+            list: [
+              {title: 'Blog Posting', value: 'BlogPosting'},
+              {title: 'News Article', value: 'NewsArticle'},
+              {title: 'Technical Article', value: 'TechArticle'},
+              {title: 'How-to Article', value: 'HowTo'},
+            ],
+          },
+          initialValue: 'BlogPosting',
+        },
+        {
+          name: 'readingTime',
+          title: 'Reading Time (minutes)',
+          type: 'number',
+          description: 'Estimated reading time in minutes',
+        },
+      ],
     }),
   ],
   preview: {
@@ -170,29 +288,106 @@ export const page = defineType({
       },
       validation: (Rule) => Rule.required(),
     }),
+    // SEO Section
     defineField({
-      name: 'seoTitle',
-      title: 'SEO Title',
-      type: 'string',
-      description: 'Title for search engines (60 chars max)',
-      validation: (Rule) => Rule.max(60),
+      name: 'seoSection',
+      title: 'SEO Settings',
+      type: 'object',
+      description: 'Search engine optimization settings for this page',
+      fields: [
+        {
+          name: 'seoTitle',
+          title: 'SEO Title',
+          type: 'string',
+          description: 'Title for search engines (50-60 characters recommended). Leave empty to use main title.',
+          validation: (Rule) => Rule.max(60).warning('SEO titles should be under 60 characters'),
+        },
+        {
+          name: 'metaDescription',
+          title: 'Meta Description',
+          type: 'text',
+          rows: 3,
+          description: 'Description for search engines and social media (150-160 characters recommended)',
+          validation: (Rule) => Rule.max(160).warning('Meta descriptions should be under 160 characters'),
+        },
+        {
+          name: 'keywords',
+          title: 'Keywords',
+          type: 'array',
+          of: [{type: 'string'}],
+          description: 'Relevant keywords for this page (comma-separated)',
+          options: {
+            layout: 'tags',
+          },
+        },
+        {
+          name: 'openGraphImage',
+          title: 'Open Graph Image',
+          type: 'image',
+          description: 'Image for social media sharing (1200x630px recommended)',
+          options: {
+            hotspot: true,
+          },
+          fields: [
+            {
+              name: 'alt',
+              title: 'Alt Text',
+              type: 'string',
+              description: 'Alt text for the Open Graph image',
+            },
+          ],
+        },
+        {
+          name: 'canonicalUrl',
+          title: 'Canonical URL',
+          type: 'url',
+          description: 'Canonical URL if this content exists elsewhere (optional)',
+        },
+        {
+          name: 'noIndex',
+          title: 'No Index',
+          type: 'boolean',
+          description: 'Prevent search engines from indexing this page',
+          initialValue: false,
+        },
+        {
+          name: 'noFollow',
+          title: 'No Follow',
+          type: 'boolean',
+          description: 'Prevent search engines from following links on this page',
+          initialValue: false,
+        },
+      ],
     }),
+    // Structured Data
     defineField({
-      name: 'metaDescription',
-      title: 'Meta Description',
-      type: 'text',
-      rows: 3,
-      description: 'Description for search engines and social media (160 chars max)',
-      validation: (Rule) => Rule.max(160),
-    }),
-    defineField({
-      name: 'openGraphImage',
-      title: 'Open Graph Image',
-      type: 'image',
-      description: 'Image for social media sharing (1200x630px recommended)',
-      options: {
-        hotspot: true,
-      },
+      name: 'structuredData',
+      title: 'Structured Data',
+      type: 'object',
+      description: 'Additional structured data for search engines',
+      fields: [
+        {
+          name: 'pageType',
+          title: 'Page Type',
+          type: 'string',
+          options: {
+            list: [
+              {title: 'Web Page', value: 'WebPage'},
+              {title: 'About Page', value: 'AboutPage'},
+              {title: 'Contact Page', value: 'ContactPage'},
+              {title: 'FAQ Page', value: 'FAQPage'},
+              {title: 'Service Page', value: 'ServicePage'},
+            ],
+          },
+          initialValue: 'WebPage',
+        },
+        {
+          name: 'breadcrumbTitle',
+          title: 'Breadcrumb Title',
+          type: 'string',
+          description: 'Title to display in breadcrumb navigation (shorter than main title)',
+        },
+      ],
     }),
     defineField({
       name: 'content',

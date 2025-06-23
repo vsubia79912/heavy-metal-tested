@@ -25,7 +25,10 @@ export const postsQuery = `*[_type == "post" && defined(slug.current)] | order(p
   publishedAt,
   "author": coalesce(author->name, null),
   "categories": coalesce(categories[]->title, []),
-  "featuredImage": coalesce(featuredImage.asset->url, null)
+  "featuredImage": coalesce(featuredImage.asset->url, null),
+  "featuredImageAlt": featuredImage.alt,
+  seoSection,
+  structuredData
 }`
 
 export const postQuery = `*[_type == "post" && slug.current == $slug][0] {
@@ -35,11 +38,13 @@ export const postQuery = `*[_type == "post" && slug.current == $slug][0] {
   content,
   excerpt,
   publishedAt,
-  seoTitle,
-  metaDescription,
   "author": coalesce(author->name, null),
   "categories": coalesce(categories[]->title, []),
-  "featuredImage": coalesce(featuredImage.asset->url, null)
+  "featuredImage": coalesce(featuredImage.asset->url, null),
+  "featuredImageAlt": featuredImage.alt,
+  "featuredImageCaption": featuredImage.caption,
+  seoSection,
+  structuredData
 }`
 
 export const postPathsQuery = `*[_type == "post" && defined(slug.current)] {
@@ -51,9 +56,8 @@ export const pageQuery = `*[_type == "page" && slug.current == $slug][0] {
   _id,
   title,
   slug,
-  seoTitle,
-  metaDescription,
-  "openGraphImage": coalesce(openGraphImage.asset->url, null),
+  seoSection,
+  structuredData,
   content[] {
     _type,
     _type == "heroSection" => {
@@ -99,9 +103,8 @@ export const homepageQuery = `*[_type == "page" && slug.current == "home" && !(_
   _id,
   title,
   slug,
-  seoTitle,
-  metaDescription,
-  "openGraphImage": coalesce(openGraphImage.asset->url, null),
+  seoSection,
+  structuredData,
   content[] {
     _type,
     _type == "heroSection" => {

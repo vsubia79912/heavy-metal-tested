@@ -6,6 +6,7 @@ import { sanityClient, postQuery, postPathsQuery } from '@/lib/sanity'
 import { Post } from '@/lib/types'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
+import SEO from '@/components/SEO'
 
 interface Props {
   params: { slug: string }
@@ -39,24 +40,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
   }
 
-  const title = post.seoTitle || post.title
-  const description = post.metaDescription || post.excerpt || 'Heavy metal testing insights and safety information.'
+  const title = post.seoSection?.seoTitle || post.title
+  const description = post.seoSection?.metaDescription || post.excerpt || 'Heavy metal testing insights and safety information.'
+  const keywords = post.seoSection?.keywords?.join(', ')
+  const ogImage = post.seoSection?.openGraphImage?.asset?.url || post.featuredImage
 
   return {
     title: `${title} | Heavy Metal Tested`,
     description,
+    keywords,
     openGraph: {
       title,
       description,
       url: `/blog/${params.slug}`,
       type: 'article',
       publishedTime: post.publishedAt,
-      images: post.featuredImage ? [
+      images: ogImage ? [
         {
-          url: post.featuredImage,
+          url: ogImage,
           width: 1200,
           height: 630,
-          alt: post.title,
+          alt: post.seoSection?.openGraphImage?.alt || post.title,
         }
       ] : undefined,
     },
@@ -64,8 +68,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: 'summary_large_image',
       title,
       description,
-      images: post.featuredImage ? [post.featuredImage] : undefined,
+      images: ogImage ? [ogImage] : undefined,
     },
+    robots: {
+      index: !post.seoSection?.noIndex,
+      follow: !post.seoSection?.noFollow,
+    },
+    ...(post.seoSection?.canonicalUrl && {
+      alternates: {
+        canonical: post.seoSection.canonicalUrl,
+      },
+    }),
   }
 }
 
@@ -112,6 +125,7 @@ export default async function BlogPostPage({ params }: Props) {
 
   return (
     <>
+      <SEO post={post} type="post" />
       <Navbar />
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 pt-20">
         <article className="section">
@@ -128,9 +142,12 @@ export default async function BlogPostPage({ params }: Props) {
               <div className="w-full h-64 md:h-96 rounded-xl overflow-hidden mb-8">
                 <img
                   src={post.featuredImage}
-                  alt={post.title}
+                  alt={post.featuredImageAlt || post.title}
                   className="w-full h-full object-cover"
                 />
+                {post.featuredImageCaption && (
+                  <p className="text-sm text-gray-600 text-center mt-2">{post.featuredImageCaption}</p>
+                )}
               </div>
             )}
 
@@ -148,6 +165,12 @@ export default async function BlogPostPage({ params }: Props) {
                   <>
                     <span className="mx-2">•</span>
                     <span>{post.author}</span>
+                  </>
+                )}
+                {post.structuredData?.readingTime && (
+                  <>
+                    <span className="mx-2">•</span>
+                    <span>{post.structuredData.readingTime} min read</span>
                   </>
                 )}
               </div>

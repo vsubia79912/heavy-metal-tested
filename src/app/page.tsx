@@ -10,6 +10,7 @@ import CertifiedProducts from '@/components/CertifiedProducts'
 import FAQ from '@/components/FAQ'
 import ContactSection from '@/components/ContactSection'
 import Footer from '@/components/Footer'
+import SEO from '@/components/SEO'
 
 async function getHomepageData(): Promise<Page | null> {
   try {
@@ -55,16 +56,31 @@ async function getHomepageData(): Promise<Page | null> {
 export async function generateMetadata(): Promise<Metadata> {
   const homepage = await getHomepageData()
 
+  const title = homepage?.seoSection?.seoTitle || 'Heavy Metal Testing & Certification | Heavy Metal Tested'
+  const description = homepage?.seoSection?.metaDescription || 'Professional heavy metal testing and certification for consumer products. Ensure your products are safe from lead, mercury, cadmium, and arsenic contamination.'
+  const keywords = homepage?.seoSection?.keywords?.join(', ')
+  const ogImage = homepage?.seoSection?.openGraphImage?.asset?.url
+
   return {
-    title: homepage?.seoTitle || 'Heavy Metal Testing & Certification | Heavy Metal Tested',
-    description: homepage?.metaDescription || 'Professional heavy metal testing and certification for consumer products. Ensure your products are safe from lead, mercury, cadmium, and arsenic contamination.',
+    title,
+    description,
+    keywords,
     openGraph: {
-      title: homepage?.seoTitle || 'Heavy Metal Testing & Certification | Heavy Metal Tested',
-      description: homepage?.metaDescription || 'Professional heavy metal testing and certification for consumer products. Ensure your products are safe from lead, mercury, cadmium, and arsenic contamination.',
-      images: homepage?.openGraphImage ? [homepage.openGraphImage] : [],
+      title,
+      description,
+      images: ogImage ? [ogImage] : [],
       url: '/',
       type: 'website',
     },
+    robots: {
+      index: !homepage?.seoSection?.noIndex,
+      follow: !homepage?.seoSection?.noFollow,
+    },
+    ...(homepage?.seoSection?.canonicalUrl && {
+      alternates: {
+        canonical: homepage.seoSection.canonicalUrl,
+      },
+    }),
   }
 }
 
@@ -93,16 +109,19 @@ export default async function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
-      <Navbar />
-      <Hero data={heroData} />
-      <Features data={featuresData} />
-      <CertificationProcess />
-      <ProductCategories />
-      <CertifiedProducts />
-      <FAQ data={faqData} />
-      <ContactSection />
-      <Footer />
-    </div>
+    <>
+      {homepage && <SEO page={homepage} type="page" />}
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+        <Navbar />
+        <Hero data={heroData} />
+        <Features data={featuresData} />
+        <CertificationProcess />
+        <ProductCategories />
+        <CertifiedProducts />
+        <FAQ data={faqData} />
+        <ContactSection />
+        <Footer />
+      </div>
+    </>
   )
 } 
